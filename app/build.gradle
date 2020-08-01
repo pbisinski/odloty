@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "kotlin-kapt"
 
+def buildProperties = new Properties()
+file("build.properties").withInputStream { stream -> buildProperties.load(stream) }
+
 android {
     compileSdkVersion compileSdk
     buildToolsVersion buildTools
@@ -15,6 +18,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_KEY", buildProperties['apiKey'])
+        buildConfigField("String", "API_URL", buildProperties['apiUrl'])
     }
 
     buildTypes {
@@ -38,6 +44,13 @@ android {
     }
 }
 
+task printProps {
+    doFirst {
+        println buildProperties.getProperty("apiKey")
+        println buildProperties.getProperty("apiUrl")
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
@@ -53,6 +66,7 @@ dependencies {
     implementation "org.koin:koin-android:$koinVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
     implementation "com.google.android.material:material:$materialVersion"
 
     testImplementation "junit:junit:$junitVersion"
