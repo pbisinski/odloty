@@ -7,7 +7,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SkyScannerDataSource {
-  @GET("/autosuggest/v1.0/{market}/{currency}/{locale}")
+  @GET("/apiservices/autosuggest/v1.0/{market}/{currency}/{locale}/")
   fun getPlaces(
     @Path("market") market: String,
     @Path("currency") currency: String,
