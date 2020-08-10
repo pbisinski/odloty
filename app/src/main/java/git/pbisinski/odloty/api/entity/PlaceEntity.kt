@@ -3,7 +3,7 @@ package git.pbisinski.odloty.api.entity
 import com.google.gson.annotations.SerializedName
 import git.pbisinski.odloty.api.model.PlaceModel
 
-class PlaceEntity(
+data class PlaceEntity(
   @SerializedName("PlaceId")
   val placeId: String,
   @SerializedName("PlaceName")

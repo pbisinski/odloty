@@ -1,7 +1,9 @@
 package git.pbisinski.odloty.api
 
 import android.util.Log
-import okhttp3.*
+import okhttp3.Headers
+import okhttp3.Interceptor
+import okhttp3.Response
 import org.json.JSONObject
 
 class LogInterceptor : Interceptor {

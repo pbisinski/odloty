@@ -6,9 +6,8 @@ import git.pbisinski.odloty.api.repository.LocalisationRepositoryImpl
 import org.koin.dsl.module
 import retrofit2.Retrofit
 
-inline fun <reified T> createWebService(retrofit: Retrofit): T {
-  return retrofit.create(T::class.java)
-}
+inline fun <reified T> createWebService(retrofit: Retrofit): T =
+  retrofit.create(T::class.java)
 
 val repositoryModule = module {
   single<SkyScannerDataSource> { createWebService(retrofit = get()) }
