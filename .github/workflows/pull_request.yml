@@ -25,3 +25,5 @@ jobs:
       run: (echo "apiKey=\"$API_KEY\""; echo "apiUrl=\"$API_URL\"") > ./app/build.properties
     - name: Detekt
       run: bash ./gradlew detekt
+    - name: Unit tests
+      run: bash ./gradlew test
