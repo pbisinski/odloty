@@ -1,6 +1,6 @@
 package git.pbisinski.odloty.api.model
 
-class PlaceModel(
+data class PlaceModel(
   val placeId: String,
   val placeName: String,
   val countryId: String,

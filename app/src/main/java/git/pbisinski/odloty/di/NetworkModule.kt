@@ -36,10 +36,14 @@ fun okHttp(
   authInterceptor: Interceptor,
   logInterceptor: Interceptor
 ): OkHttpClient = OkHttpClient.Builder()
-  .connectTimeout(30, TimeUnit.SECONDS)
+  .connectTimeout(TIMEOUT_CONNECT_SEC, TimeUnit.SECONDS)
   .addInterceptor(authInterceptor)
   .addInterceptor(logInterceptor)
   .protocols(listOf(Protocol.HTTP_1_1))
-  .readTimeout(30, TimeUnit.SECONDS)
-  .writeTimeout(30, TimeUnit.SECONDS)
+  .readTimeout(TIMEOUT_READ_SEC, TimeUnit.SECONDS)
+  .writeTimeout(TIMEOUT_WRITE_SEC, TimeUnit.SECONDS)
   .build()
+
+private const val TIMEOUT_CONNECT_SEC = 30L
+private const val TIMEOUT_READ_SEC = 30L
+private const val TIMEOUT_WRITE_SEC = 30L
