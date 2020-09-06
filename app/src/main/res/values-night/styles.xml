@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:statusBarColor">@color/almostBlack</item>
+        <item name="android:background">@color/almostBlack</item>
+        <item name="cardViewStyle">@style/CardView.Rounded.Dark</item>
+    </style>
+    <style name="CardView.Rounded.Dark" parent="CardView.Rounded">
+        <item name="cardBackgroundColor">@color/lightBlue</item>
+        <item name="cardShadowColor">@color/darkBlue</item>
+    </style>
+</resources>

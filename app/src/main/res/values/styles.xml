@@ -1,11 +1,23 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardViewStyle">@style/CardView.Rounded.Light</item>
+    </style>
+    <style name="CardView.Rounded" parent="CardView">
+        <item name="cardCornerRadius">@dimen/cardview_radius</item>
+        <item name="layout_constraintStart_toStartOf">parent</item>
+        <item name="layout_constraintEnd_toEndOf">parent</item>
+        <item name="useCompatPadding">true</item>
+    </style>
+    <style name="CardView.Rounded.Light" parent="CardView.Rounded">
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="cardShadowColor">@color/lightBlue</item>
     </style>
 
 </resources>
