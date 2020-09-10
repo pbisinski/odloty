@@ -1,13 +1,11 @@
 package git.pbisinski.odloty.view.base
 
-import android.content.Intent
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import git.pbisinski.odloty.view.Navigator
-import git.pbisinski.odloty.view.Scene
 import git.pbisinski.odloty.view.Screen
 
 abstract class BaseActivity : AppCompatActivity(), Navigator {
@@ -19,14 +17,13 @@ abstract class BaseActivity : AppCompatActivity(), Navigator {
     lazy { DataBindingUtil.setContentView<T>(this, resId) }
 
   override fun onBackPressed() {
-    val currentFragment = supportFragmentManager.fragments.lastOrNull() as? BaseFragment<*> ?: error("")
-    if (!currentFragment.backPressed()) {
+    if (supportFragmentManager.backStackEntryCount == 1) {
       finish()
     }
-  }
-
-  override fun openScene(scene: Scene) {
-    Intent(this, scene.activity.java).let(::startActivity)
+    val currentFragment = supportFragmentManager.fragments.lastOrNull() as? BaseFragment<*> ?: error("")
+    if (!currentFragment.backPressed()) {
+      super.onBackPressed()
+    }
   }
 
   override fun showScreen(screen: Screen) {

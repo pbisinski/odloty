@@ -1,4 +1,4 @@
-package git.pbisinski.odloty.view.screen.dashboard
+package git.pbisinski.odloty.view.screen.search
 
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +7,7 @@ import git.pbisinski.odloty.R
 import git.pbisinski.odloty.api.repository.LocalisationRepository
 import git.pbisinski.odloty.databinding.FragmentSearchBinding
 import git.pbisinski.odloty.view.base.BaseFragment
+import git.pbisinski.odloty.view.screen.start.SplashScreen
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -21,6 +22,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setupListeners()
+    binding.textviewFirst.text = this.toString()
   }
 
   private fun setupListeners() {
@@ -33,6 +35,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
           onSuccess = { responseText -> binding.textviewFirst.text = responseText },
           onError = { error -> Log.e(javaClass.simpleName, "download error", error) }
         )
+    }
+    binding.buttonNavigate.setOnClickListener {
+      navigator.showScreen(screen = SplashScreen)
     }
   }
 }

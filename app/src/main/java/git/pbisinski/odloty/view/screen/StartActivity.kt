@@ -1,10 +1,10 @@
-package git.pbisinski.odloty.view.screen.start
+package git.pbisinski.odloty.view.screen
 
 import android.os.Bundle
 import git.pbisinski.odloty.R
 import git.pbisinski.odloty.databinding.ActivityStartBinding
 import git.pbisinski.odloty.view.base.BaseActivity
-import git.pbisinski.odloty.view.screen.start.StartScene.StartScreen
+import git.pbisinski.odloty.view.screen.start.SplashScreen
 
 class StartActivity : BaseActivity() {
 
@@ -15,6 +15,6 @@ class StartActivity : BaseActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    showScreen(screen = StartScreen.Splash)
+    showScreen(screen = SplashScreen) // initial screen
   }
 }

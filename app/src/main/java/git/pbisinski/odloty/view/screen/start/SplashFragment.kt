@@ -5,7 +5,7 @@ import android.view.View
 import git.pbisinski.odloty.R
 import git.pbisinski.odloty.databinding.FragmentSplashBinding
 import git.pbisinski.odloty.view.base.BaseFragment
-import git.pbisinski.odloty.view.screen.dashboard.DashboardScene
+import git.pbisinski.odloty.view.screen.dashboard.DashboardScreen
 
 class SplashFragment : BaseFragment<FragmentSplashBinding>() {
 
@@ -14,7 +14,7 @@ class SplashFragment : BaseFragment<FragmentSplashBinding>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     binding.buttonNavigate.setOnClickListener {
-      navigator.openScene(scene = DashboardScene)
+      navigator.showScreen(screen = DashboardScreen)
     }
   }
 }
