@@ -6,15 +6,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/button_navigate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_medium"
-            android:text="GO TO SEARCH()"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+        <FrameLayout
+            android:id="@+id/navigation_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/bottom_navigator"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/textview_first"
@@ -22,9 +19,24 @@
             android:layout_height="wrap_content"
             android:text="DASHBOARD FRAGMENT"
             android:textSize="@dimen/text_large"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <git.pbisinski.odloty.view.BottomNavigator
+            android:id="@+id/bottom_navigator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:currentButton="@{bottomModel.currentlySelectedItem}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:screens="@{bottomModel.screens}" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <data>
+
+        <variable
+            name="bottomModel"
+            type="git.pbisinski.odloty.view.screen.dashboard.BottomNavigatorModel" />
+    </data>
 </layout>

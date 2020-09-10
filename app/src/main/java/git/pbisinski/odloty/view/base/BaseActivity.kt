@@ -7,6 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import git.pbisinski.odloty.view.Navigator
 import git.pbisinski.odloty.view.Screen
+import git.pbisinski.odloty.view.showScreen
 
 abstract class BaseActivity : AppCompatActivity(), Navigator {
 
@@ -17,21 +18,17 @@ abstract class BaseActivity : AppCompatActivity(), Navigator {
     lazy { DataBindingUtil.setContentView<T>(this, resId) }
 
   override fun onBackPressed() {
-    if (supportFragmentManager.backStackEntryCount == 1) {
-      finish()
-    }
     val currentFragment = supportFragmentManager.fragments.lastOrNull() as? BaseFragment<*> ?: error("")
     if (!currentFragment.backPressed()) {
+      if (supportFragmentManager.backStackEntryCount == 1) {
+        finish()
+        return
+      }
       super.onBackPressed()
     }
   }
 
   override fun showScreen(screen: Screen) {
-    supportFragmentManager.beginTransaction().run {
-      val tag = screen.fragment.simpleName
-      replace(navigationContainer, screen.fragment.java, screen.args)
-      addToBackStack(tag)
-      commit()
-    }
+    supportFragmentManager.showScreen(screen = screen, containerResId = navigationContainer)
   }
 }

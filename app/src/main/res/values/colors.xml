@@ -3,4 +3,9 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="platinium">#E9ECEA</color>
+    <color name="smoky_black">#131111</color>
+    <color name="blue_sky">#20C8E9</color>
+    <color name="amaranth_red">#DB222A</color>
 </resources>
