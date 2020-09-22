@@ -1,2 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.AppCompatToggleButton style="@style/ButtonBottomNavigation" />
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.appcompat.widget.AppCompatToggleButton
+        style="@style/ButtonBottomNavigation"
+        android:checked="@{model.isSelected}"
+        android:text="@{model.label}"
+        android:textOff="@{model.label}"
+        android:textOn="@{model.label}" />
+
+    <data>
+
+        <variable
+            name="model"
+            type="git.pbisinski.odloty.view.screen.dashboard.BottomNavigatorModel.BottomButtonModel" />
+    </data>
+</layout>

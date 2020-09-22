@@ -5,98 +5,100 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.ToggleButton
-import androidx.databinding.BindingAdapter
-import androidx.databinding.InverseBindingAdapter
+import androidx.annotation.IdRes
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Observer
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleObserver
 import git.pbisinski.odloty.R
+import git.pbisinski.odloty.BR
+import git.pbisinski.odloty.databinding.BottomNavigatorButtonBinding
 import git.pbisinski.odloty.view.screen.dashboard.BottomNavigatorModel
-import git.pbisinski.odloty.view.utils.getChildViews
 
 class BottomNavigator @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr) {
+) : LinearLayout(context, attrs, defStyleAttr),
+  LifecycleObserver,
+  FragmentManager.OnBackStackChangedListener,
+  Observer<BottomNavigatorModel.BottomButtonModel> {
 
   companion object {
     private val BUTTON_PARAMS = LayoutParams(0, LayoutParams.MATCH_PARENT, 1F)
-    private const val INVALID_ID = -1
-
-    @BindingAdapter("currentButton")
-    @JvmStatic
-    fun BottomNavigator.setSelected(buttonId: Int) {
-      if (buttonId != currentlySelected) {
-        currentlySelected = buttonId
-      }
-    }
-
-    @InverseBindingAdapter(attribute = "currentlySelected", event = "currentlySelectedAttrChanged")
-    @JvmStatic
-    fun BottomNavigator.getCurrentlySelected() = currentlySelected
-
-    @BindingAdapter("screens")
-    @JvmStatic
-    fun BottomNavigator.setScreens(list: List<BottomNavigatorModel.ScreenModel>) {
-      screens = list
-      onScreenChanged(screenId = currentlySelected)
-    }
+    private const val NO_CONTAINER = -1
   }
 
-  var currentlySelected: Int = INVALID_ID
-    set(value) {
-      onScreenChanged(screenId = value)
-      updateButtons(clickedId = value)
-      field = value
-    }
+  private lateinit var currentlySelected: MutableLiveData<BottomNavigatorModel.BottomButtonModel>
+  private var screens: List<BottomNavigatorModel.BottomButtonModel> = emptyList()
 
-  var onScreenChanged: ((BottomNavigatorModel.ScreenModel) -> Unit)? = null
-
-  private var screens: List<BottomNavigatorModel.ScreenModel> = emptyList()
-    set(value) {
-      buildLayout(screens = value)
-      field = value
-    }
-
-  private val buttons: List<ToggleButton>
-    get() = getChildViews()
+  private var containerResId: Int = NO_CONTAINER
+  private var fragmentManager: FragmentManager? = null
 
   init {
     orientation = HORIZONTAL
   }
 
-  private fun buildLayout(screens: List<BottomNavigatorModel.ScreenModel>) {
-    this.weightSum = screens.size.toFloat()
-    screens.forEachIndexed { index, screen ->
-      val button = createButton(label = screen.label)
-      button.isChecked = currentlySelected == index
-      button.setOnClickListener { setSelected(index) }
+  fun attach(fragment: Fragment, @IdRes containerId: Int, model: BottomNavigatorModel) {
+    setupObservers(fragment = fragment, model = model)
+    fragmentManager = fragment.childFragmentManager
+    containerResId = containerId
+    screens = model.screens
+    currentlySelected = model.selectedStream
+    buildLayout(screens = model.screens, lifecycleOwner = fragment.viewLifecycleOwner)
+  }
+
+  @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+  fun detach() {
+    fragmentManager?.removeOnBackStackChangedListener(this)
+    fragmentManager = null
+  }
+
+  override fun onBackStackChanged() {
+    fragmentManager?.run {
+      val selectedTag = getBackStackEntryAt(backStackEntryCount - 1).name
+      if (currentlySelected.value?.label == selectedTag) return
+      val selectedScreen = screens.find { screen -> screen.label == selectedTag } ?: error("Couldn't find screen!")
+      currentlySelected.value = selectedScreen
+    }
+  }
+
+  override fun onChanged(model: BottomNavigatorModel.BottomButtonModel?) {
+    model ?: return
+    fragmentManager?.showScreen(screen = model.screen, containerResId = containerResId)
+  }
+
+  private fun buildLayout(screens: List<BottomNavigatorModel.BottomButtonModel>, lifecycleOwner: LifecycleOwner) {
+    weightSum = screens.size.toFloat()
+    screens.forEach { model ->
+      val button = createButton(screenModel = model, lifecycleOwner = lifecycleOwner)
+      button.setOnClickListener { currentlySelected.value = model }
       addView(button, BUTTON_PARAMS)
     }
   }
 
-  private fun createButton(label: String): ToggleButton {
-    val button = LayoutInflater.from(context).inflate(
-      R.layout.bottom_navigator_button,
-      this,
-      false
-    ) as ToggleButton
+  private fun createButton(
+    screenModel: BottomNavigatorModel.BottomButtonModel,
+    lifecycleOwner: LifecycleOwner
+  ): ToggleButton {
+    val binding = BottomNavigatorButtonBinding.inflate(LayoutInflater.from(context))
+    binding.setVariable(BR.model, screenModel)
+    binding.lifecycleOwner = lifecycleOwner
+    val button = binding.root as ToggleButton
     val drawable = resources.getDrawable(R.drawable.ic_ghost, null)
     button.apply {
       setCompoundDrawablesRelativeWithIntrinsicBounds(null, drawable, null, null)
-      text = label
-      textOff = label
-      textOn = label
     }
     return button
   }
 
-  private fun updateButtons(clickedId: Int) {
-    buttons.forEachIndexed { index, button ->
-      button.isChecked = index == clickedId
-    }
-  }
-
-  private fun onScreenChanged(screenId: Int) {
-    if (screens.isEmpty() || screenId == INVALID_ID) return
-    onScreenChanged?.invoke(screens[screenId])
+  private fun setupObservers(fragment: Fragment, model: BottomNavigatorModel) {
+    fragment.viewLifecycleOwner.lifecycle.addObserver(this)
+    fragment.childFragmentManager.addOnBackStackChangedListener(this)
+    model.selectedStream.observe(fragment.viewLifecycleOwner, this)
   }
 }

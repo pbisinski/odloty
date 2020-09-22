@@ -26,7 +26,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setupListeners()
-    binding.textviewFirst.text = this.toString()
+    binding.textviewSecond.text = this.toString()
   }
 
   private fun setupListeners() {

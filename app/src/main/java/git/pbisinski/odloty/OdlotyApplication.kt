@@ -3,6 +3,7 @@ package git.pbisinski.odloty
 import android.app.Application
 import git.pbisinski.odloty.di.networkModule
 import git.pbisinski.odloty.di.repositoryModule
+import git.pbisinski.odloty.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -19,7 +20,8 @@ class OdlotyApplication : Application() {
       androidContext(this@OdlotyApplication)
       modules(
         networkModule,
-        repositoryModule
+        repositoryModule,
+        viewModelModule
       )
     }
   }

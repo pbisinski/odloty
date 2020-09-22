@@ -27,16 +27,14 @@
             android:id="@+id/bottom_navigator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:currentButton="@{bottomModel.currentlySelectedItem}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:screens="@{bottomModel.screens}" />
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <data>
 
         <variable
-            name="bottomModel"
-            type="git.pbisinski.odloty.view.screen.dashboard.BottomNavigatorModel" />
+            name="viewModel"
+            type="git.pbisinski.odloty.view.screen.dashboard.DashboardViewModel" />
     </data>
 </layout>
