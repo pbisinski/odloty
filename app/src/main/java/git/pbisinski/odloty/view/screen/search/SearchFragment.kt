@@ -1,26 +1,28 @@
-package git.pbisinski.odloty.view
+package git.pbisinski.odloty.view.screen.search
 
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
-import androidx.databinding.DataBindingUtil
+import android.view.View
 import git.pbisinski.odloty.R
 import git.pbisinski.odloty.api.repository.LocalisationRepository
-import git.pbisinski.odloty.databinding.ActivityMainBinding
+import git.pbisinski.odloty.databinding.FragmentSearchBinding
+import git.pbisinski.odloty.view.base.BaseFragment
+import git.pbisinski.odloty.view.screen.start.SplashScreen
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 
-class MainActivity : AppCompatActivity() {
+class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
-  private lateinit var binding: ActivityMainBinding
+  override val layoutIdRes: Int = R.layout.fragment_search
+
   private val localisationRepository: LocalisationRepository by inject()
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
     setupListeners()
+    binding.textviewFirst.text = this.toString()
   }
 
   private fun setupListeners() {
@@ -33,6 +35,9 @@ class MainActivity : AppCompatActivity() {
           onSuccess = { responseText -> binding.textviewFirst.text = responseText },
           onError = { error -> Log.e(javaClass.simpleName, "download error", error) }
         )
+    }
+    binding.buttonNavigate.setOnClickListener {
+      navigator.showScreen(screen = SplashScreen)
     }
   }
 }
