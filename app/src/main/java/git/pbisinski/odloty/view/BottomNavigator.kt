@@ -5,100 +5,95 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.ToggleButton
-import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import git.pbisinski.odloty.R
-import git.pbisinski.odloty.BR
-import git.pbisinski.odloty.databinding.BottomNavigatorButtonBinding
-import git.pbisinski.odloty.view.screen.dashboard.BottomNavigatorModel
+import git.pbisinski.odloty.view.screen.dashboard.BottomScreenModel
 
 class BottomNavigator @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0
-) : LinearLayout(context, attrs, defStyleAttr),
-  LifecycleObserver,
-  FragmentManager.OnBackStackChangedListener,
-  Observer<BottomNavigatorModel.BottomButtonModel> {
+) : LinearLayout(context, attrs, defStyleAttr), LifecycleObserver, FragmentManager.OnBackStackChangedListener {
 
   companion object {
     private val BUTTON_PARAMS = LayoutParams(0, LayoutParams.MATCH_PARENT, 1F)
-    private const val NO_CONTAINER = -1
   }
 
-  private lateinit var currentlySelected: MutableLiveData<BottomNavigatorModel.BottomButtonModel>
-  private var screens: List<BottomNavigatorModel.BottomButtonModel> = emptyList()
-
-  private var containerResId: Int = NO_CONTAINER
   private var fragmentManager: FragmentManager? = null
+  private val buttonsList: HashMap<String, ToggleButton> = hashMapOf()
+  private var onNavigation: ((BottomScreenModel) -> Unit)? = null
 
   init {
     orientation = HORIZONTAL
+    buttonsList.clear()
   }
 
-  fun attach(fragment: Fragment, @IdRes containerId: Int, model: BottomNavigatorModel) {
-    setupObservers(fragment = fragment, model = model)
+  fun attach(fragment: Fragment, screenModels: List<BottomScreenModel>, onNavigate: (BottomScreenModel) -> Unit) {
     fragmentManager = fragment.childFragmentManager
-    containerResId = containerId
-    screens = model.screens
-    currentlySelected = model.selectedStream
-    buildLayout(screens = model.screens, lifecycleOwner = fragment.viewLifecycleOwner)
+    onNavigation = onNavigate
+    buildLayout(models = screenModels)
+    setupObservers(fragment = fragment)
+    onBackStackChanged()
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
   fun detach() {
     fragmentManager?.removeOnBackStackChangedListener(this)
     fragmentManager = null
+    buttonsList.clear()
+    onNavigation = null
   }
 
   override fun onBackStackChanged() {
     fragmentManager?.run {
-      val selectedTag = getBackStackEntryAt(backStackEntryCount - 1).name
-      if (currentlySelected.value?.label == selectedTag) return
-      val selectedScreen = screens.find { screen -> screen.label == selectedTag } ?: error("Couldn't find screen!")
-      currentlySelected.value = selectedScreen
+      val lastFragIndex = (backStackEntryCount - 1).takeIf { it >= 0 } ?: return
+      val visibleFragName = getBackStackEntryAt(lastFragIndex).name ?: error("Couldn't get frag name!")
+      updateSelection(screenLabel = visibleFragName)
     }
   }
 
-  override fun onChanged(model: BottomNavigatorModel.BottomButtonModel?) {
-    model ?: return
-    fragmentManager?.showScreen(screen = model.screen, containerResId = containerResId)
-  }
-
-  private fun buildLayout(screens: List<BottomNavigatorModel.BottomButtonModel>, lifecycleOwner: LifecycleOwner) {
-    weightSum = screens.size.toFloat()
-    screens.forEach { model ->
-      val button = createButton(screenModel = model, lifecycleOwner = lifecycleOwner)
-      button.setOnClickListener { currentlySelected.value = model }
+  private fun buildLayout(models: List<BottomScreenModel>) {
+    weightSum = models.size.toFloat()
+    models.forEach { model ->
+      val button = createButton(label = model.label)
+      button.setOnClickListener { view ->
+        if (!view.isSelected) {
+          onNavigation?.invoke(model)
+          updateSelection(screenLabel = model.screen.name)
+        }
+      }
       addView(button, BUTTON_PARAMS)
+      buttonsList[model.screen.name] = button
     }
   }
 
-  private fun createButton(
-    screenModel: BottomNavigatorModel.BottomButtonModel,
-    lifecycleOwner: LifecycleOwner
-  ): ToggleButton {
-    val binding = BottomNavigatorButtonBinding.inflate(LayoutInflater.from(context))
-    binding.setVariable(BR.model, screenModel)
-    binding.lifecycleOwner = lifecycleOwner
-    val button = binding.root as ToggleButton
+  private fun updateSelection(screenLabel: String) {
+    buttonsList.forEach { (id, view) -> view.isChecked = id == screenLabel }
+  }
+
+  private fun createButton(label: String): ToggleButton {
+    val button = LayoutInflater.from(context).inflate(
+      R.layout.bottom_navigator_button,
+      this,
+      false
+    ) as ToggleButton
+    // TODO: 2020-09-30 replace with better looking button
     val drawable = resources.getDrawable(R.drawable.ic_ghost, null)
     button.apply {
       setCompoundDrawablesRelativeWithIntrinsicBounds(null, drawable, null, null)
+      text = label
+      textOff = label
+      textOn = label
     }
     return button
   }
 
-  private fun setupObservers(fragment: Fragment, model: BottomNavigatorModel) {
+  private fun setupObservers(fragment: Fragment) {
     fragment.viewLifecycleOwner.lifecycle.addObserver(this)
-    fragment.childFragmentManager.addOnBackStackChangedListener(this)
-    model.selectedStream.observe(fragment.viewLifecycleOwner, this)
+    fragmentManager?.addOnBackStackChangedListener(this)
   }
 }

@@ -11,4 +11,5 @@ interface Navigator {
 interface Screen {
   val fragment: KClass<out Fragment>
   val args: Bundle
+  val name: String
 }

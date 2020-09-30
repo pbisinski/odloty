@@ -14,8 +14,8 @@ abstract class BaseActivity : AppCompatActivity(), Navigator {
   @get:IdRes
   protected abstract val navigationContainer: Int
 
-  protected inline fun <reified T : ViewDataBinding> binding(@LayoutRes resId: Int): Lazy<T> =
-    lazy { DataBindingUtil.setContentView<T>(this, resId) }
+  protected inline fun <reified T : ViewDataBinding> binding(@LayoutRes resId: Int): T =
+    DataBindingUtil.setContentView(this, resId)
 
   override fun onBackPressed() {
     val currentFragment = supportFragmentManager.fragments.lastOrNull() as? BaseFragment<*> ?: error("")

@@ -8,13 +8,14 @@ import git.pbisinski.odloty.view.screen.dashboard.DashboardScreen
 
 class StartActivity : BaseActivity() {
 
-  private val binding: ActivityStartBinding by binding(R.layout.activity_start)
+  lateinit var binding: ActivityStartBinding
 
   override val navigationContainer: Int
     get() = binding.rootContainer.id
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    showScreen(screen = DashboardScreen) // initial screen
+    binding = binding(R.layout.activity_start)
+    if (savedInstanceState == null) showScreen(screen = DashboardScreen) // initial screen
   }
 }

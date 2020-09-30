@@ -6,4 +6,5 @@ import git.pbisinski.odloty.view.Screen
 object DashboardScreen : Screen {
   override val fragment = DashboardFragment::class
   override val args: Bundle = Bundle.EMPTY
+  override val name: String = "DashboardScreen"
 }

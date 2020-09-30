@@ -6,4 +6,5 @@ import git.pbisinski.odloty.view.Screen
 object SearchScreen : Screen {
   override val fragment = SearchFragment::class
   override val args: Bundle = Bundle.EMPTY
+  override val name: String = "SearchScreen"
 }
