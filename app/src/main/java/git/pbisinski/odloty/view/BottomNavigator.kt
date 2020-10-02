@@ -25,14 +25,14 @@ class BottomNavigator @JvmOverloads constructor(
 
   private var fragmentManager: FragmentManager? = null
   private val buttonsList: HashMap<String, ToggleButton> = hashMapOf()
-  private var onNavigation: ((BottomScreenModel) -> Unit)? = null
+  private var onNavigation: ((Screen) -> Unit)? = null
 
   init {
     orientation = HORIZONTAL
     buttonsList.clear()
   }
 
-  fun attach(fragment: Fragment, screenModels: List<BottomScreenModel>, onNavigate: (BottomScreenModel) -> Unit) {
+  fun attach(fragment: Fragment, screenModels: List<BottomScreenModel>, onNavigate: (Screen) -> Unit) {
     fragmentManager = fragment.childFragmentManager
     onNavigation = onNavigate
     buildLayout(models = screenModels)
@@ -62,7 +62,7 @@ class BottomNavigator @JvmOverloads constructor(
       val button = createButton(label = model.label)
       button.setOnClickListener { view ->
         if (!view.isSelected) {
-          onNavigation?.invoke(model)
+          onNavigation?.invoke(model.screen)
           updateSelection(screenLabel = model.screen.name)
         }
       }

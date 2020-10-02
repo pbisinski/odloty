@@ -32,7 +32,7 @@ abstract class BaseFragment<DB : ViewDataBinding> : Fragment() {
     return binding.root
   }
 
-  open fun backPressed(): Boolean = false
+  open fun backPressed(): Boolean = navigator.popScreen()
 
   override fun onDestroyView() {
     super.onDestroyView()

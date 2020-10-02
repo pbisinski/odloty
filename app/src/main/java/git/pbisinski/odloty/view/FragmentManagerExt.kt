@@ -11,3 +11,11 @@ fun FragmentManager.showScreen(screen: Screen, @IdRes containerResId: Int, uniqu
     commit()
   }
 }
+
+fun FragmentManager.canPop(): Boolean = backStackEntryCount > 1
+
+fun FragmentManager.pop(): Boolean {
+  val canPop = canPop()
+  if (canPop) popBackStack()
+  return canPop
+}
