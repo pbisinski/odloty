@@ -1,0 +1,29 @@
+name: Android Pull Request CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+jobs:
+  check:
+    name: Detekt & Unit Tests
+    runs-on: ubuntu-18.04
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Decode build.properties file
+      env:
+        API_KEY: ${{ secrets.API_KEY }}
+        API_URL: ${{ secrets.API_URL }}
+      run: (echo "apiKey=\"$API_KEY\""; echo "apiUrl=\"$API_URL\"") > ./app/build.properties
+    - name: Detekt
+      run: bash ./gradlew detekt
+    - name: Unit tests
+      run: bash ./gradlew test
