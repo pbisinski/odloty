@@ -19,7 +19,7 @@ abstract class BaseActivity : AppCompatActivity(), Navigator {
     DataBindingUtil.setContentView(this, resId)
 
   override fun onBackPressed() {
-    val currentFragment = supportFragmentManager.fragments.lastOrNull() as? BaseFragment<*>
+    val currentFragment = supportFragmentManager.fragments.lastOrNull() as? BaseFragment
     val backHandled = currentFragment?.backPressed() ?: false
     if (!backHandled && !popScreen()) finish()
   }
