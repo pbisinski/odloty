@@ -27,7 +27,7 @@ class SearchFragment : BaseFragment() {
   private val localisationRepository: LocalisationRepository by inject()
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-    createBinding<FragmentSearchBinding>(
+    createBindedView<FragmentSearchBinding>(
       layoutResId = R.layout.fragment_search,
       inflater = inflater,
       container = container,

@@ -11,7 +11,7 @@ import git.pbisinski.odloty.view.base.BaseFragment
 class SplashFragment : BaseFragment() {
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-    createBinding<FragmentSplashBinding>(
+    createBindedView<FragmentSplashBinding>(
       layoutResId = R.layout.fragment_splash,
       inflater = inflater,
       container = container

@@ -16,7 +16,7 @@ abstract class BaseFragment : Fragment() {
 
   open fun backPressed(): Boolean = navigator.popScreen()
 
-  protected inline fun <reified T : ViewDataBinding> createBinding(
+  protected inline fun <reified T : ViewDataBinding> createBindedView(
     @LayoutRes layoutResId: Int,
     inflater: LayoutInflater,
     container: ViewGroup?,

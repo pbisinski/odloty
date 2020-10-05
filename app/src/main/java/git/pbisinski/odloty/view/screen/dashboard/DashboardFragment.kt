@@ -24,7 +24,7 @@ class DashboardFragment : BaseFragment(), Navigator {
   private var binding: FragmentDashboardBinding by DisposableVar()
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-    createBinding<FragmentDashboardBinding>(
+    createBindedView<FragmentDashboardBinding>(
       layoutResId = R.layout.fragment_dashboard,
       inflater = inflater,
       container = container,
