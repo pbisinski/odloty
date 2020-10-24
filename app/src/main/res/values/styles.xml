@@ -8,4 +8,31 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Button" />
+
+    <style name="Button.BottomNavigation" parent="Text.Light">
+        <item name="android:textColor">@color/selector_bottom_navigate_button_text_color</item>
+        <item name="android:background">@color/platinium</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">@dimen/margin_small</item>
+        <item name="android:layout_margin">0dp</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">14dp</item>
+    </style>
+
+    <style name="Text" />
+
+    <style name="Text.Regular">
+        <item name="android:fontFamily">@font/poppins_regular</item>
+    </style>
+
+    <style name="Text.Bold">
+        <item name="android:fontFamily">@font/poppins_bold</item>
+    </style>
+
+    <style name="Text.Light">
+        <item name="android:fontFamily">@font/poppins_light</item>
+    </style>
+
 </resources>

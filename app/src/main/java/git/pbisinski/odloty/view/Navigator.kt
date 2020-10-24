@@ -6,9 +6,11 @@ import kotlin.reflect.KClass
 
 interface Navigator {
   fun showScreen(screen: Screen)
+  fun popScreen(): Boolean
 }
 
 interface Screen {
   val fragment: KClass<out Fragment>
   val args: Bundle
+  val name: String
 }

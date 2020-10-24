@@ -9,6 +9,8 @@ import git.pbisinski.odloty.databinding.FragmentSearchBinding
 import git.pbisinski.odloty.view.base.BaseFragment
 import git.pbisinski.odloty.view.screen.start.SplashScreen
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
@@ -17,12 +19,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
   override val layoutIdRes: Int = R.layout.fragment_search
 
+  private val disposable = CompositeDisposable()
+
   private val localisationRepository: LocalisationRepository by inject()
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setupListeners()
-    binding.textviewFirst.text = this.toString()
+    binding.textviewSecond.text = this.toString()
   }
 
   private fun setupListeners() {
@@ -34,10 +38,15 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         .subscribeBy(
           onSuccess = { responseText -> binding.textviewFirst.text = responseText },
           onError = { error -> Log.e(javaClass.simpleName, "download error", error) }
-        )
+        ).addTo(disposable)
     }
     binding.buttonNavigate.setOnClickListener {
       navigator.showScreen(screen = SplashScreen)
     }
+  }
+
+  override fun onStop() {
+    disposable.clear()
+    super.onStop()
   }
 }

@@ -1,24 +1,77 @@
 package git.pbisinski.odloty.view.screen.dashboard
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.lifecycle.ViewModel
+import git.pbisinski.odloty.BR
 import git.pbisinski.odloty.R
 import git.pbisinski.odloty.databinding.FragmentDashboardBinding
+import git.pbisinski.odloty.view.Navigator
+import git.pbisinski.odloty.view.Screen
 import git.pbisinski.odloty.view.base.BaseFragment
+import git.pbisinski.odloty.view.pop
 import git.pbisinski.odloty.view.screen.search.SearchScreen
+import git.pbisinski.odloty.view.screen.start.SplashScreen
+import git.pbisinski.odloty.view.showScreen
+import org.koin.android.viewmodel.ext.android.viewModel
 
-class DashboardFragment : BaseFragment<FragmentDashboardBinding>() {
+class DashboardFragment : BaseFragment<FragmentDashboardBinding>(), Navigator {
 
   override val layoutIdRes: Int = R.layout.fragment_dashboard
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    setupListeners()
+  private val vm: DashboardViewModel by viewModel()
+
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    val view = super.onCreateView(inflater, container, savedInstanceState)
+    binding.setVariable(BR.viewModel, vm)
+    return view
   }
 
-  private fun setupListeners() {
-    binding.buttonNavigate.setOnClickListener {
-      navigator.showScreen(screen = SearchScreen)
-    }
+  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    super.onViewCreated(view, savedInstanceState)
+    binding.textviewFirst.text = this.toString()
+    binding.bottomNavigator.attach(
+      fragment = this,
+      screenModels = vm.navigationScreens,
+      onNavigate = ::showScreen
+    )
+    if (childFragmentManager.backStackEntryCount == 0) showScreen(screen = vm.initialScreen)
   }
+
+  override fun backPressed(): Boolean = popScreen()
+
+  override fun showScreen(screen: Screen) {
+    childFragmentManager.showScreen(screen = screen, containerResId = binding.navigationContainer.id)
+  }
+
+  override fun popScreen(): Boolean = childFragmentManager.pop()
 }
+
+// TODO: 2020-09-30 move view model to separate file
+class DashboardViewModel : ViewModel() {
+
+  val navigationScreens: List<BottomScreenModel> = listOf(
+    BottomScreenModel(
+      screen = SplashScreen,
+      label = "Wyszukaj",
+      iconResId = R.drawable.selector_bottom_navigate_search
+    ),
+    BottomScreenModel(
+      screen = SearchScreen,
+      label = "Zapisane",
+      iconResId = R.drawable.selector_bottom_navigate_stack
+    )
+  )
+
+  val initialScreen: Screen = navigationScreens.first().screen
+}
+
+// TODO: 2020-09-30 move model to separate file
+class BottomScreenModel(
+  val screen: Screen,
+  val label: String,
+  @DrawableRes val iconResId: Int
+)
