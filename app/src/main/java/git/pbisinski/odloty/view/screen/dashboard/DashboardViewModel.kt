@@ -47,17 +47,21 @@ class DashboardViewModel : BaseViewModel<DashboardIntent, DashboardState, Dashbo
     val screenChanges = filterIsInstance<DashboardIntent.GoToTab>()
       .map {
         { state: DashboardState ->
-          state.copy(text = "Current ${it.tabScreen.name}")
+          state.copy(text = "Clicked tab ${it.tabScreen.name}")
         }
       }
 
-    return merge(screenChanges)
+    return merge(
+      screenChanges
+    )
   }
 
   override fun Flow<DashboardIntent>.toEvent(): Flow<DashboardEvent> {
     val screenChanges = filterIsInstance<DashboardIntent.GoToTab>()
       .map { DashboardEvent.ChangeTab(it.tabScreen) }
 
-    return merge(screenChanges)
+    return merge(
+      screenChanges
+    )
   }
 }

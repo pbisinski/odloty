@@ -28,7 +28,7 @@ class SearchViewModel(
   override fun Flow<SearchIntent>.toChange(): Flow<SearchState.() -> SearchState> {
     val places = getPlaces()
       .map {
-        { state: SearchState -> state.copy(text = "Pobrano ${it.size} elementów") }
+        { state: SearchState -> state.copy(text = "Downloaded ${it.size} elements") }
       }
 
     return merge(
@@ -44,10 +44,12 @@ class SearchViewModel(
         }
       }
 
-    return merge(navigation)
+    return merge(
+      navigation
+    )
   }
 
   private fun getPlaces(): Flow<List<PlaceModel>> = suspendedFlow {
-    locationRepository.getPlaces(market = "PL", currency = "ILS", locale = "en-EN", query = "Israel")
+    locationRepository.getPlaces(market = "PL", currency = "PLN", locale = "en-EN", query = "Warsaw")
   }
 }
