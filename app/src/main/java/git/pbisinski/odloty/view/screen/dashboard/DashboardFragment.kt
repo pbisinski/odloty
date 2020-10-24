@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import git.pbisinski.odloty.BR
 import git.pbisinski.odloty.R
@@ -60,11 +61,13 @@ class DashboardViewModel : ViewModel() {
   val navigationScreens: List<BottomScreenModel> = listOf(
     BottomScreenModel(
       screen = SplashScreen,
-      label = "Pierwszy"
+      label = "Wyszukaj",
+      iconResId = R.drawable.selector_bottom_navigate_search
     ),
     BottomScreenModel(
       screen = SearchScreen,
-      label = "Drugi"
+      label = "Zapisane",
+      iconResId = R.drawable.selector_bottom_navigate_stack
     )
   )
 
@@ -74,5 +77,6 @@ class DashboardViewModel : ViewModel() {
 // TODO: 2020-09-30 move model to separate file
 class BottomScreenModel(
   val screen: Screen,
-  val label: String
+  val label: String,
+  @DrawableRes val iconResId: Int
 )

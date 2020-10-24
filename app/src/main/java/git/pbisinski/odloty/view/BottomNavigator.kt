@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
-import android.widget.ToggleButton
+import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
@@ -24,12 +24,11 @@ class BottomNavigator @JvmOverloads constructor(
   }
 
   private var fragmentManager: FragmentManager? = null
-  private val buttonsList: HashMap<String, ToggleButton> = hashMapOf()
+  private val buttonsList: HashMap<String, AppCompatButton> = hashMapOf()
   private var onNavigation: ((Screen) -> Unit)? = null
 
   init {
     orientation = HORIZONTAL
-    buttonsList.clear()
   }
 
   fun attach(fragment: Fragment, screenModels: List<BottomScreenModel>, onNavigate: (Screen) -> Unit) {
@@ -59,11 +58,11 @@ class BottomNavigator @JvmOverloads constructor(
   private fun buildLayout(models: List<BottomScreenModel>) {
     weightSum = models.size.toFloat()
     models.forEach { model ->
-      val button = createButton(label = model.label)
+      val button = createButton(model = model)
       button.setOnClickListener { view ->
         if (!view.isSelected) {
           onNavigation?.invoke(model.screen)
-          updateSelection(screenLabel = model.screen.name)
+          view.isSelected = true
         }
       }
       addView(button, BUTTON_PARAMS)
@@ -72,23 +71,18 @@ class BottomNavigator @JvmOverloads constructor(
   }
 
   private fun updateSelection(screenLabel: String) {
-    buttonsList.forEach { (id, view) -> view.isChecked = id == screenLabel }
+    buttonsList.forEach { (id, view) -> view.isSelected = id == screenLabel }
   }
 
-  private fun createButton(label: String): ToggleButton {
+  private fun createButton(model: BottomScreenModel): AppCompatButton {
     val button = LayoutInflater.from(context).inflate(
       R.layout.bottom_navigator_button,
       this,
       false
-    ) as ToggleButton
-    // TODO: 2020-09-30 replace with better looking button
-    val drawable = resources.getDrawable(R.drawable.ic_ghost, null)
-    button.apply {
-      setCompoundDrawablesRelativeWithIntrinsicBounds(null, drawable, null, null)
-      text = label
-      textOff = label
-      textOn = label
-    }
+    ) as AppCompatButton
+    val drawable = resources.getDrawable(model.iconResId, null)
+    button.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null)
+    button.text = model.label
     return button
   }
 
