@@ -1,63 +1,70 @@
 package git.pbisinski.odloty.view.screen.search
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import git.pbisinski.odloty.R
-import git.pbisinski.odloty.api.repository.LocalisationRepository
 import git.pbisinski.odloty.databinding.FragmentSearchBinding
 import git.pbisinski.odloty.view.base.BaseFragment
-import git.pbisinski.odloty.view.screen.start.SplashScreen
 import git.pbisinski.odloty.view.utils.DisposableVar
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.addTo
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
-import org.koin.android.ext.android.inject
+import git.pbisinski.odloty.view.utils.clicks
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class SearchFragment : BaseFragment() {
 
-  // TODO: 2020-10-05 remove rx java in the future!
-  private val disposable = CompositeDisposable()
+  @ExperimentalCoroutinesApi
+  private val vModel: SearchViewModel by sharedViewModel()
   private var binding: FragmentSearchBinding by DisposableVar()
 
-  private val localisationRepository: LocalisationRepository by inject()
-
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-    createBindedView<FragmentSearchBinding>(
-      layoutResId = R.layout.fragment_search,
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    binding = binding(
       inflater = inflater,
       container = container,
-      block = { binding = this }
+      layoutResId = R.layout.fragment_search
     )
+    binding.lifecycleOwner = this
+    return binding.root
+  }
 
+  @ExperimentalCoroutinesApi
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    setupListeners()
-    binding.textviewSecond.text = this.toString()
+    binding.run {
+      viewScope.launchWhenStarted {
+        vModel.state
+          .onEach { state = it }
+          .collect()
+      }
+      viewScope.launchWhenStarted {
+        vModel.event
+          .onEach { handleSingleEvent(it) }
+          .collect()
+      }
+      viewScope.launchWhenStarted {
+        intents
+          .onEach { vModel.process(it) }
+          .collect()
+      }
+    }
   }
 
-  private fun setupListeners() {
-    binding.buttonDownload.setOnClickListener {
-      localisationRepository.getPlaces(market = "PL", currency = "PLN", locale = "pl-PL", query = "Warsaw")
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .map { response -> "downloaded ${response.size} places" }
-        .subscribeBy(
-          onSuccess = { responseText -> binding.textviewFirst.text = responseText },
-          onError = { error -> Log.e(javaClass.simpleName, "download error", error) }
-        ).addTo(disposable)
-    }
-    binding.buttonNavigate.setOnClickListener {
-      navigator.showScreen(screen = SplashScreen)
-    }
-  }
+  @ExperimentalCoroutinesApi
+  private val FragmentSearchBinding.intents: Flow<SearchIntent>
+    get() = merge(
+      buttonNavigate.clicks().map { SearchIntent.Route.GoToSplash },
+      buttonDownload.clicks().map { SearchIntent.Download }
+    )
 
-  override fun onStop() {
-    disposable.clear()
-    super.onStop()
+  private fun handleSingleEvent(event: SearchEvent) {
+    when (event) {
+      is SearchEvent.RouteTo -> navigator.showScreen(screen = event.destination)
+    }
   }
 }
