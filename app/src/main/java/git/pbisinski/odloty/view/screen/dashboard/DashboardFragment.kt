@@ -13,8 +13,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.collect
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class DashboardFragment : BaseNavigationFragment() {
@@ -36,31 +34,20 @@ class DashboardFragment : BaseNavigationFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     binding.run {
-      viewScope.launchWhenStarted {
-        vModel.state
-          .onEach { state = it }
-          .collect()
-      }
-      viewScope.launchWhenStarted {
-        vModel.event
-          .onEach { handleSingleEvent(it) }
-          .collect()
-      }
-      viewScope.launchWhenStarted {
-        intents()
-          .onEach { vModel.process(it) }
-          .collect()
-      }
+      vModel.state.observe { state = it }
+      vModel.event.observe { handleSingleEvent(event = it) }
+      intents.observe { vModel.process(intent = it) }
     }
   }
 
   @ExperimentalCoroutinesApi
-  private fun FragmentDashboardBinding.intents(): Flow<DashboardIntent> {
-    val tabChange = bottomNavigator.screenChanges()
-      .map { DashboardIntent.GoToTab(it) }
+  private val FragmentDashboardBinding.intents: Flow<DashboardIntent>
+    get() {
+      val tabChange = bottomNavigator.screenChanges()
+        .map { DashboardIntent.GoToTab(it) }
 
-    return merge(tabChange)
-  }
+      return merge(tabChange)
+    }
 
   private fun handleSingleEvent(event: DashboardEvent) {
     when (event) {

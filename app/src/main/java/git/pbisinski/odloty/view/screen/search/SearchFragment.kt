@@ -11,16 +11,14 @@ import git.pbisinski.odloty.view.utils.DisposableVar
 import git.pbisinski.odloty.view.utils.clicks
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import org.koin.android.viewmodel.ext.android.sharedViewModel
 
 class SearchFragment : BaseFragment() {
 
   @ExperimentalCoroutinesApi
-  private val vModel: SearchViewModel by sharedViewModel()
+  private val vModel: SearchViewModel by sharedViewModel() // all dashboard screens require shared VM
   private var binding: FragmentSearchBinding by DisposableVar()
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -37,21 +35,9 @@ class SearchFragment : BaseFragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     binding.run {
-      viewScope.launchWhenStarted {
-        vModel.state
-          .onEach { state = it }
-          .collect()
-      }
-      viewScope.launchWhenStarted {
-        vModel.event
-          .onEach { handleSingleEvent(it) }
-          .collect()
-      }
-      viewScope.launchWhenStarted {
-        intents
-          .onEach { vModel.process(it) }
-          .collect()
-      }
+      vModel.state.observe { state = it }
+      vModel.event.observe { handleSingleEvent(it) }
+      intents.observe { vModel.process(it) }
     }
   }
 
