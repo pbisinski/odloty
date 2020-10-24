@@ -11,24 +11,29 @@ import git.pbisinski.odloty.R
 import git.pbisinski.odloty.databinding.FragmentDashboardBinding
 import git.pbisinski.odloty.view.Navigator
 import git.pbisinski.odloty.view.Screen
-import git.pbisinski.odloty.view.base.BaseFragment
 import git.pbisinski.odloty.view.pop
+import git.pbisinski.odloty.view.showScreen
+import git.pbisinski.odloty.view.base.BaseFragment
 import git.pbisinski.odloty.view.screen.search.SearchScreen
 import git.pbisinski.odloty.view.screen.start.SplashScreen
-import git.pbisinski.odloty.view.showScreen
+import git.pbisinski.odloty.view.utils.DisposableVar
 import org.koin.android.viewmodel.ext.android.viewModel
 
-class DashboardFragment : BaseFragment<FragmentDashboardBinding>(), Navigator {
-
-  override val layoutIdRes: Int = R.layout.fragment_dashboard
+class DashboardFragment : BaseFragment(), Navigator {
 
   private val vm: DashboardViewModel by viewModel()
+  private var binding: FragmentDashboardBinding by DisposableVar()
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-    val view = super.onCreateView(inflater, container, savedInstanceState)
-    binding.setVariable(BR.viewModel, vm)
-    return view
-  }
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+    createBindedView<FragmentDashboardBinding>(
+      layoutResId = R.layout.fragment_dashboard,
+      inflater = inflater,
+      container = container,
+      block = {
+        setVariable(BR.viewModel, vm)
+        binding = this
+      }
+    )
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
