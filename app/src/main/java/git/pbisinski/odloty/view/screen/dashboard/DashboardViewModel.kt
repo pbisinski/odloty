@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 
+private typealias Change = DashboardState.() -> DashboardState
+
 data class DashboardState(
   val text: String
 )
@@ -43,25 +45,15 @@ class DashboardViewModel : BaseViewModel<DashboardIntent, DashboardState, Dashbo
     }
   }
 
-  override fun Flow<DashboardIntent>.toChange(): Flow<DashboardState.() -> DashboardState> {
-    val screenChanges = filterIsInstance<DashboardIntent.GoToTab>()
-      .map {
-        { state: DashboardState ->
-          state.copy(text = "Clicked tab ${it.tabScreen.name}")
-        }
-      }
+  override fun Flow<DashboardIntent>.toChange(): Flow<Change> = merge(
+    filterIsInstance<DashboardIntent.GoToTab>().map { onTabChange(it) }
+  )
 
-    return merge(
-      screenChanges
-    )
-  }
+  override fun Flow<DashboardIntent>.toEvent(): Flow<DashboardEvent> = merge(
+    filterIsInstance<DashboardIntent.GoToTab>().map { DashboardEvent.ChangeTab(it.tabScreen) }
+  )
 
-  override fun Flow<DashboardIntent>.toEvent(): Flow<DashboardEvent> {
-    val screenChanges = filterIsInstance<DashboardIntent.GoToTab>()
-      .map { DashboardEvent.ChangeTab(it.tabScreen) }
-
-    return merge(
-      screenChanges
-    )
+  private fun onTabChange(intent: DashboardIntent.GoToTab): Change {
+    return { copy(text = "Clicked tab ${intent.tabScreen.name}") }
   }
 }

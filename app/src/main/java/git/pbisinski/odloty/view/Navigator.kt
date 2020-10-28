@@ -7,6 +7,7 @@ import kotlin.reflect.KClass
 interface Navigator {
   fun showScreen(screen: Screen)
   fun popScreen(): Boolean
+  fun popWithResult(result: Any): Boolean
 }
 
 interface Screen {
@@ -14,3 +15,5 @@ interface Screen {
   val args: Bundle
   val name: String
 }
+
+interface ModalScreen : Screen

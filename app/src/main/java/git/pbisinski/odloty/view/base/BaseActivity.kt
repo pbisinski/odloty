@@ -7,6 +7,7 @@ import androidx.databinding.ViewDataBinding
 import git.pbisinski.odloty.view.Navigator
 import git.pbisinski.odloty.view.Screen
 import git.pbisinski.odloty.view.pop
+import git.pbisinski.odloty.view.popWithResult
 import git.pbisinski.odloty.view.showScreen
 
 abstract class BaseActivity : AppCompatActivity(), Navigator {
@@ -25,6 +26,8 @@ abstract class BaseActivity : AppCompatActivity(), Navigator {
   override fun showScreen(screen: Screen) = supportFragmentManager.showScreen(screen = screen)
 
   override fun popScreen(): Boolean = supportFragmentManager.pop()
+
+  override fun popWithResult(result: Any): Boolean = supportFragmentManager.popWithResult(result)
 
   //endregion
 }
