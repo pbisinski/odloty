@@ -4,79 +4,54 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.DrawableRes
-import androidx.lifecycle.ViewModel
-import git.pbisinski.odloty.BR
 import git.pbisinski.odloty.R
 import git.pbisinski.odloty.databinding.FragmentDashboardBinding
-import git.pbisinski.odloty.view.Navigator
-import git.pbisinski.odloty.view.Screen
-import git.pbisinski.odloty.view.pop
-import git.pbisinski.odloty.view.showScreen
-import git.pbisinski.odloty.view.base.BaseFragment
-import git.pbisinski.odloty.view.screen.search.SearchScreen
-import git.pbisinski.odloty.view.screen.start.SplashScreen
+import git.pbisinski.odloty.view.base.BaseNavigationFragment
 import git.pbisinski.odloty.view.utils.DisposableVar
-import org.koin.android.viewmodel.ext.android.viewModel
+import git.pbisinski.odloty.view.utils.screenChanges
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import org.koin.android.viewmodel.ext.android.sharedViewModel
 
-class DashboardFragment : BaseFragment(), Navigator {
+class DashboardFragment : BaseNavigationFragment() {
 
-  private val vm: DashboardViewModel by viewModel()
+  @ExperimentalCoroutinesApi
+  private val vModel: DashboardViewModel by sharedViewModel()
   private var binding: FragmentDashboardBinding by DisposableVar()
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-    createBindedView<FragmentDashboardBinding>(
-      layoutResId = R.layout.fragment_dashboard,
-      inflater = inflater,
-      container = container,
-      block = {
-        setVariable(BR.viewModel, vm)
-        binding = this
-      }
-    )
+  @ExperimentalCoroutinesApi
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    binding = binding(inflater = inflater, container = container, layoutResId = R.layout.fragment_dashboard)
+    binding.viewModel = vModel
+    binding.lifecycleOwner = this
+    binding.bottomNavigator.attach(lifecycleOwner = viewLifecycleOwner, manager = childFragmentManager)
+    return binding.root
+  }
 
+  @ExperimentalCoroutinesApi
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    binding.textviewFirst.text = this.toString()
-    binding.bottomNavigator.attach(
-      fragment = this,
-      screenModels = vm.navigationScreens,
-      onNavigate = ::showScreen
-    )
-    if (childFragmentManager.backStackEntryCount == 0) showScreen(screen = vm.initialScreen)
+    binding.run {
+      vModel.state.observe { state = it }
+      vModel.event.observe { handleSingleEvent(event = it) }
+      intents.observe { vModel.process(intent = it) }
+    }
   }
 
-  override fun backPressed(): Boolean = popScreen()
+  @ExperimentalCoroutinesApi
+  private val FragmentDashboardBinding.intents: Flow<DashboardIntent>
+    get() {
+      val tabChange = bottomNavigator.screenChanges()
+        .map { DashboardIntent.GoToTab(it) }
 
-  override fun showScreen(screen: Screen) {
-    childFragmentManager.showScreen(screen = screen, containerResId = binding.navigationContainer.id)
+      return merge(tabChange)
+    }
+
+  private fun handleSingleEvent(event: DashboardEvent) {
+    when (event) {
+      is DashboardEvent.ChangeTab -> showScreen(screen = event.tabScreen)
+    }
   }
-
-  override fun popScreen(): Boolean = childFragmentManager.pop()
 }
-
-// TODO: 2020-09-30 move view model to separate file
-class DashboardViewModel : ViewModel() {
-
-  val navigationScreens: List<BottomScreenModel> = listOf(
-    BottomScreenModel(
-      screen = SplashScreen,
-      label = "Wyszukaj",
-      iconResId = R.drawable.selector_bottom_navigate_search
-    ),
-    BottomScreenModel(
-      screen = SearchScreen,
-      label = "Zapisane",
-      iconResId = R.drawable.selector_bottom_navigate_stack
-    )
-  )
-
-  val initialScreen: Screen = navigationScreens.first().screen
-}
-
-// TODO: 2020-09-30 move model to separate file
-class BottomScreenModel(
-  val screen: Screen,
-  val label: String,
-  @DrawableRes val iconResId: Int
-)

@@ -1,4 +1,4 @@
-package git.pbisinski.odloty.view.screen.start
+package git.pbisinski.odloty.view.screen.splash
 
 import android.os.Bundle
 import git.pbisinski.odloty.view.Screen

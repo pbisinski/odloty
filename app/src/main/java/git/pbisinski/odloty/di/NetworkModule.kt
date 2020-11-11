@@ -9,7 +9,6 @@ import okhttp3.Protocol
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
@@ -29,7 +28,6 @@ fun retrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
   .baseUrl(OdlotyApplication.URL)
   .client(client)
   .addConverterFactory(GsonConverterFactory.create())
-  .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
   .build()
 
 fun okHttp(

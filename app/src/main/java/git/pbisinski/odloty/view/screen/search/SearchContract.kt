@@ -8,3 +8,17 @@ object SearchScreen : Screen {
   override val args: Bundle = Bundle.EMPTY
   override val name: String = "SearchScreen"
 }
+
+sealed class SearchIntent {
+  object Download : SearchIntent()
+
+  sealed class Route : SearchIntent() {
+    object GoToSplash : Route()
+  }
+}
+
+sealed class SearchEvent {
+  class RouteTo(
+    val destination: Screen
+  ) : SearchEvent()
+}

@@ -5,13 +5,15 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatButton
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import git.pbisinski.odloty.R
-import git.pbisinski.odloty.view.screen.dashboard.BottomScreenModel
+import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LifecycleOwner
+
+import git.pbisinski.odloty.view.model.BottomTabModel
 
 class BottomNavigator @JvmOverloads constructor(
   context: Context,
@@ -21,22 +23,31 @@ class BottomNavigator @JvmOverloads constructor(
 
   companion object {
     private val BUTTON_PARAMS = LayoutParams(0, LayoutParams.MATCH_PARENT, 1F)
+
+    @JvmStatic
+    @BindingAdapter("tabs")
+    fun BottomNavigator.setModels(tabs: List<BottomTabModel>) {
+      buildLayout(tabs = tabs)
+    }
   }
 
   private var fragmentManager: FragmentManager? = null
   private val buttonsList: HashMap<String, AppCompatButton> = hashMapOf()
-  private var onNavigation: ((Screen) -> Unit)? = null
+
+  var onNavigation: ((Screen) -> Unit)? = null
+    set(value) {
+      field = value
+      onBackStackChanged()
+    }
 
   init {
     orientation = HORIZONTAL
   }
 
-  fun attach(fragment: Fragment, screenModels: List<BottomScreenModel>, onNavigate: (Screen) -> Unit) {
-    fragmentManager = fragment.childFragmentManager
-    onNavigation = onNavigate
-    buildLayout(models = screenModels)
-    setupObservers(fragment = fragment)
-    onBackStackChanged()
+  fun attach(lifecycleOwner: LifecycleOwner, manager: FragmentManager) {
+    fragmentManager = manager
+    lifecycleOwner.lifecycle.addObserver(this)
+    manager.addOnBackStackChangedListener(this)
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -55,14 +66,14 @@ class BottomNavigator @JvmOverloads constructor(
     }
   }
 
-  private fun buildLayout(models: List<BottomScreenModel>) {
-    weightSum = models.size.toFloat()
-    models.forEach { model ->
+  private fun buildLayout(tabs: List<BottomTabModel>) {
+    weightSum = tabs.size.toFloat()
+    tabs.forEach { model ->
       val button = createButton(model = model)
       button.setOnClickListener { view ->
         if (!view.isSelected) {
           onNavigation?.invoke(model.screen)
-          view.isSelected = true
+          updateSelection(screenLabel = model.screen.name)
         }
       }
       addView(button, BUTTON_PARAMS)
@@ -74,7 +85,7 @@ class BottomNavigator @JvmOverloads constructor(
     buttonsList.forEach { (id, view) -> view.isSelected = id == screenLabel }
   }
 
-  private fun createButton(model: BottomScreenModel): AppCompatButton {
+  private fun createButton(model: BottomTabModel): AppCompatButton {
     val button = LayoutInflater.from(context).inflate(
       R.layout.bottom_navigator_button,
       this,
@@ -84,10 +95,5 @@ class BottomNavigator @JvmOverloads constructor(
     button.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null)
     button.text = model.label
     return button
-  }
-
-  private fun setupObservers(fragment: Fragment) {
-    fragment.viewLifecycleOwner.lifecycle.addObserver(this)
-    fragmentManager?.addOnBackStackChangedListener(this)
   }
 }

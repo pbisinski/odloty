@@ -8,3 +8,11 @@ object DashboardScreen : Screen {
   override val args: Bundle = Bundle.EMPTY
   override val name: String = "DashboardScreen"
 }
+
+sealed class DashboardIntent {
+  class GoToTab(val tabScreen: Screen) : DashboardIntent()
+}
+
+sealed class DashboardEvent {
+  class ChangeTab(val tabScreen: Screen) : DashboardEvent()
+}

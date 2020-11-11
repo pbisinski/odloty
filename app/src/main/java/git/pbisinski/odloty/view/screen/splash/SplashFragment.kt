@@ -1,4 +1,4 @@
-package git.pbisinski.odloty.view.screen.start
+package git.pbisinski.odloty.view.screen.splash
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,9 +11,9 @@ import git.pbisinski.odloty.view.base.BaseFragment
 class SplashFragment : BaseFragment() {
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-    createBindedView<FragmentSplashBinding>(
-      layoutResId = R.layout.fragment_splash,
+    binding<FragmentSplashBinding>(
       inflater = inflater,
-      container = container
-    )
+      container = container,
+      layoutResId = R.layout.fragment_splash
+    ).root
 }
