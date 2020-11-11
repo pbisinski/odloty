@@ -11,4 +11,10 @@
     <color name="darkBlue">#6A86D9</color>
     <color name="lightGray">#BCBCBC</color>
     <color name="darkGray">#707070</color>
+
+    <color name="platinium">#E9ECEA</color>
+    <color name="smoky_black">#131111</color>
+    <color name="thistle">#696363</color>
+    <color name="blue_sky">#20C8E9</color>
+    <color name="amaranth_red">#DB222A</color>
 </resources>

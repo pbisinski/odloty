@@ -3,6 +3,9 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: "kotlin-kapt"
 
+def buildProperties = new Properties()
+file("build.properties").withInputStream { stream -> buildProperties.load(stream) }
+
 android {
     compileSdkVersion compileSdk
     buildToolsVersion buildTools
@@ -15,6 +18,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "API_KEY", buildProperties['apiKey'])
+        buildConfigField("String", "API_URL", buildProperties['apiUrl'])
     }
 
     buildTypes {
@@ -38,19 +44,27 @@ android {
     }
 }
 
+task printProps {
+    doFirst {
+        println buildProperties.getProperty("apiKey")
+        println buildProperties.getProperty("apiUrl")
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
-    implementation "androidx.core:core-ktx:$ktxVersion"
+    implementation "androidx.core:core-ktx:$ktxCoreVersion"
+    implementation "androidx.fragment:fragment-ktx:$ktxFragmentVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$archLifecycleVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintVersion"
     implementation "com.mikepenz:fastadapter:$fastAdapterVersion"
-    implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
-    implementation "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "org.koin:koin-android:$koinVersion"
+    implementation "org.koin:koin-android-viewmodel:$koinVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.google.android.material:material:$materialVersion"
