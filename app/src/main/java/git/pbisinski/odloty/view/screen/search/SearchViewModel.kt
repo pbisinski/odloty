@@ -5,15 +5,12 @@ import git.pbisinski.odloty.api.repository.LocationRepository
 import git.pbisinski.odloty.view.base.BaseViewModel
 import git.pbisinski.odloty.view.screen.bottomsheet.PlaceChoosingScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.switchMap
 
 private typealias Change = SearchState.() -> SearchState
 
@@ -29,7 +26,6 @@ class SearchViewModel(
   override val initial: SearchState
     get() = SearchState(text = "korutyna :)")
 
-  @FlowPreview
   override fun Flow<SearchIntent>.toChange(): Flow<Change> = merge(
     filterIsInstance<SearchIntent.Download>().flatMapLatest { getPlaces(it.query) }
   )
