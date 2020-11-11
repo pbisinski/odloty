@@ -53,7 +53,6 @@ class DashboardViewModel : BaseViewModel<DashboardIntent, DashboardState, Dashbo
     filterIsInstance<DashboardIntent.GoToTab>().map { DashboardEvent.ChangeTab(it.tabScreen) }
   )
 
-  private fun onTabChange(intent: DashboardIntent.GoToTab): Change {
-    return { copy(text = "Clicked tab ${intent.tabScreen.name}") }
-  }
+  private fun onTabChange(intent: DashboardIntent.GoToTab): Change =
+    { copy(text = "Clicked tab ${intent.tabScreen.name}") }
 }
