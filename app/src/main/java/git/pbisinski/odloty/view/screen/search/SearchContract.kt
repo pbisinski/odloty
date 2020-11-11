@@ -10,7 +10,7 @@ object SearchScreen : Screen {
 }
 
 sealed class SearchIntent {
-  object Download : SearchIntent()
+  class Download(val query: String) : SearchIntent()
 
   sealed class Route : SearchIntent() {
     object GoToSplash : Route()
